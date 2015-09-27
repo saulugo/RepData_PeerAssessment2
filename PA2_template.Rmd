@@ -14,15 +14,44 @@ For this data analysis, the following R packages are required:
 
 - knitr
 - dplyr
-- lattice
+- ggplot2
+- reshape2
 
 ```{r set_options}
 require(knitr)
 require(dplyr)
 require(lattice)
-opts_chunk$set(echo=TRUE)
+require(reshape2)
+opts_chunk$set(echo=TRUE,cache=TRUE)
+```
+##Main Questions of the Analysis
+This analysis try to respond the following questions:
+
+1) Accross the United States, which types of events are most harmful with respect to population health?
+2) Accross the United States, which types of events have the greatest economic consequences?
+
+##Data Processing
+
+The data is downloaded from the Course website as a zip file. The URL ishttps://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2
+
+The following code chunk download the data and decompress the file. The final file is a csv file:
+
+```{r download_data}
+if(!file.exists("./data")) dir.create("data") #The data will be stored inside a directory named data in your working directory for this project
+
+if(!file.exists("./data/storm_data.csv.bz2"))
+        download.file(url='https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2',destfile="./data/storm_data.csv.bz2",method="curl")
+
+data <- read.csv('./data/storm_data.csv.bz2')
 ```
 
-##Loading and Processing the Data
+Now that the data is loaded, and looking to answer the first question about the impact of the wheather events to the public health, a new dataframe will be built and named **fat_evtype**. This dataframe summarize the number of fatalities per wheather event type. From the stom data set loaded before, the variable **EVTYPE** provides the **Event Type classification** and the variable **FATALITIES** provides the number of **Fatalities** on each event recoreded in the dataset. Similarly, using the variable **INJURIES** it can be summarized the number of people injured per type of event. The numer of people injured per type of event will be summarized in a dataframe named **inj_evtype**.
 
-The
+Finally both dataframes (fat_evtype and inj_evtype) will be merged into a dataframe named **human_dmg** which contains the number of fatalities and injuries per wheather event.
+
+```{r fat_inj_dataframe}
+fat_evtype <- aggregate(FATALITIES ~ EVTYPE, data=data, sum)
+inj_evtype <- aggregate(INJURIES ~ EVTYPE, data=data, sum)
+human_dmg <- merge(fat_evtype,inj_evtype, by.x="EVTYPE", by.y="EVTYPE")
+head(human_dmg)
+```

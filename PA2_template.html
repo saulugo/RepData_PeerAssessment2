@@ -78,7 +78,8 @@ img {
 <ul>
 <li>knitr</li>
 <li>dplyr</li>
-<li>lattice</li>
+<li>ggplot2</li>
+<li>reshape2</li>
 </ul>
 <pre class="r"><code>require(knitr)</code></pre>
 <pre><code>## Loading required package: knitr</code></pre>
@@ -98,11 +99,41 @@ img {
 <pre class="r"><code>require(lattice)</code></pre>
 <pre><code>## Loading required package: lattice</code></pre>
 <pre><code>## Warning: package 'lattice' was built under R version 3.1.3</code></pre>
-<pre class="r"><code>opts_chunk$set(echo=TRUE)</code></pre>
+<pre class="r"><code>require(reshape2)</code></pre>
+<pre><code>## Loading required package: reshape2</code></pre>
+<pre class="r"><code>opts_chunk$set(echo=TRUE,cache=TRUE)</code></pre>
 </div>
-<div id="loading-and-processing-the-data" class="section level2">
-<h2>Loading and Processing the Data</h2>
-<p>The</p>
+<div id="main-questions-of-the-analysis" class="section level2">
+<h2>Main Questions of the Analysis</h2>
+<p>This analysis try to respond the following questions:</p>
+<ol style="list-style-type: decimal">
+<li>Accross the United States, which types of events are most harmful with respect to population health?</li>
+<li>Accross the United States, which types of events have the greatest economic consequences?</li>
+</ol>
+</div>
+<div id="data-processing" class="section level2">
+<h2>Data Processing</h2>
+<p>The data is downloaded from the Course website as a zip file. The URL ishttps://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2</p>
+<p>The following code chunk download the data and decompress the file. The final file is a csv file:</p>
+<pre class="r"><code>if(!file.exists(&quot;./data&quot;)) dir.create(&quot;data&quot;) #The data will be stored inside a directory named data in your working directory for this project
+
+if(!file.exists(&quot;./data/storm_data.csv.bz2&quot;))
+        download.file(url='https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2',destfile=&quot;./data/storm_data.csv.bz2&quot;,method=&quot;curl&quot;)
+
+data &lt;- read.csv('./data/storm_data.csv.bz2')</code></pre>
+<p>Now that the data is loaded, and looking to answer the first question about the impact of the wheather events to the public health, a new dataframe will be built and named <strong>fat_evtype</strong>. This dataframe summarize the number of fatalities per wheather event type. From the stom data set loaded before, the variable <strong>EVTYPE</strong> provides the <strong>Event Type classification</strong> and the variable <strong>FATALITIES</strong> provides the number of <strong>Fatalities</strong> on each event recoreded in the dataset. Similarly, using the variable <strong>INJURIES</strong> it can be summarized the number of people injured per type of event. The numer of people injured per type of event will be summarized in a dataframe named <strong>inj_evtype</strong>.</p>
+<p>Finally both dataframes (fat_evtype and inj_evtype) will be merged into a dataframe named <strong>human_dmg</strong> which contains the number of fatalities and injuries per wheather event.</p>
+<pre class="r"><code>fat_evtype &lt;- aggregate(FATALITIES ~ EVTYPE, data=data, sum)
+inj_evtype &lt;- aggregate(INJURIES ~ EVTYPE, data=data, sum)
+human_dmg &lt;- merge(fat_evtype,inj_evtype, by.x=&quot;EVTYPE&quot;, by.y=&quot;EVTYPE&quot;)
+head(human_dmg)</code></pre>
+<pre><code>##                  EVTYPE FATALITIES INJURIES
+## 1    HIGH SURF ADVISORY          0        0
+## 2         COASTAL FLOOD          0        0
+## 3           FLASH FLOOD          0        0
+## 4             LIGHTNING          0        0
+## 5             TSTM WIND          0        0
+## 6       TSTM WIND (G45)          0        0</code></pre>
 </div>
 
 
