@@ -1,0 +1,28 @@
+---
+title: Analysis of the Economic and Public Health Impact of Severe Weather Events
+  in the United States from 1950 to 2011
+author: "Saul Lugo"
+date: "September 27, 2015"
+output: html_document
+---
+
+##Synopsis
+Lorem Ipsum Data Analysis operalis, verbose, courserum datum.
+
+##Preliminary Data Processing Requierements
+For this data analysis, the following R packages are required:
+
+- knitr
+- dplyr
+- lattice
+
+```{r set_options}
+require(knitr)
+require(dplyr)
+require(lattice)
+opts_chunk$set(echo=TRUE)
+```
+
+##Loading and Processing the Data
+
+The
